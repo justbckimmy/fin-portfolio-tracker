@@ -87,11 +87,9 @@ Repository 없이 다른 도메인의 데이터를 조합해서 응답을 계산
 
 ### Holding은 저장되지 않는 계산 결과
 
-`Holding`은 별도의 `@Entity`나 DB 테이블이 아닙니다. `HoldingService`가 매
+`HoldingService`가 매
 요청마다 `TradeRepository`에서 전체 거래 내역을 읽어와 그 자리에서 계산한
-**응답 전용 DTO(`HoldingResponse`)**입니다. 거래 내역만 있으면 언제든 같은
-결과를 재현할 수 있기 때문에, 보유 현황을 별도로 저장하고 매 거래마다
-동기화할 필요가 없습니다.
+**응답 전용 DTO(`HoldingResponse`)**입니다. 
 
 ### 포트폴리오 요약은 Holding 결과를 재사용
 
@@ -99,13 +97,6 @@ Repository 없이 다른 도메인의 데이터를 조합해서 응답을 계산
 만든 보유 종목 목록을 그대로 받아서 종목 수를 세고 총 매수금액을 합산합니다.
 같은 계산 로직이 여러 곳에 중복되지 않도록 상위 도메인이 하위 도메인의
 결과를 재사용하는 구조입니다.
-
-### 예외 처리
-
-`TradeService`는 거래를 저장하기 전에 종목 존재 여부, 거래 유형, 수량, 가격을
-검증합니다. 특히 **존재하지 않는 `stockId`로 거래를 등록하려고 하면**
-`IllegalArgumentException`을 던지고, `GlobalExceptionHandler`가 이를
-`400 Bad Request`와 함께 통일된 형식의 `ErrorResponse`로 변환해서 응답합니다.
 
 ## 8. 실행 방법
 
@@ -127,10 +118,6 @@ cd "Fin Portfolio Tracker"
 gradlew.bat bootRun
 ```
 
-서버가 정상적으로 실행되면 `http://localhost:8080` 에서 API를 호출할 수
-있습니다. 데이터베이스는 인메모리 H2를 사용하므로, 별도의 DB 설치 없이 바로
-실행 가능하며 애플리케이션을 재시작하면 데이터는 초기화됩니다.
-
 ### 테스트 실행
 
 ```bash
@@ -139,8 +126,6 @@ gradlew.bat bootRun
 
 ## 9. curl 테스트 예시
 
-아래 순서대로 요청을 보내면 "종목 등록 → 매수 → 매도 → 보유 현황 확인 →
-포트폴리오 요약 확인"까지 전체 흐름을 확인할 수 있습니다.
 
 ### 1) 종목 등록
 
@@ -262,8 +247,6 @@ curl -X POST http://localhost:8080/trades \
   "message": "존재하지 않는 종목입니다."
 }
 ```
-
-위 요청은 `HTTP 400 Bad Request`와 함께 반환됩니다.
 
 ## 10. 에러 처리 방식
 
